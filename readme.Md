@@ -1,11 +1,14 @@
 # Healthcare 2.0
 This is a project that is focused on data transformation within the health care industry. The project was inspired by a desire to automate the data ingestion and use of health care data via the Fast Helath Interoperability Resources 
 
-# Installation
-The project uses the following components
+# Project Architecture
+The project is architected using the following components.
+![Solution Architecture](docs/architectural-plan.png)
 - .Net Hosted Service that is required to run Extract Transform and Load Jobs from defined external data sources.
 - A HAPI FHIR Server that serves as a repository for transformed data to FHIR resource format.
 - A Clinical Decision Support Hooks REST service to surface requests in the EHR
+
+# Project Developer Set-up Guide
 
 ## .Net Hosted Data Manager
 The ingress data source can be any ingress data source. Available ingress data socurces inlude
@@ -122,7 +125,7 @@ The following example shows the use of a SQL Data source in setting up the data 
 	}
 ```
 
-## HAPI Fhir Server
+## HAPI FHIR Server
 You will need a local instance of the HAPI FHIR Server. You can run this via docker using the following commands
 ```bash
 docker pull hapiproject/hapi:latest
@@ -130,4 +133,20 @@ docker run -p 8080:8080 hapiproject/hapi:latest
 ```
 This will run the docker image with the default configuration, mapping port 8080 from the container to port 8080 in the host. Once running, you can access http://localhost:8080/ in the browser to access the HAPI FHIR server's UI or use http://localhost:8080/fhir/ as the base URL for your REST requests.
 
-## CDS Hooks API Application
+#### Connecting the HAPI FHIR server to The Data manager
+- Navigate to the Fhir.DataManager project and open the appsettings.json
+- Modify the appsettings.json ConnectionString:DataConnection entry to match your datasourxe
+```json
+  "FhirServer": {
+    "Url": "http://localhost:8080/fhir/"
+  },
+```
+
+## Clinical Decision Support Hooks Service
+Clinical Decision Support (CDS) Hooks is a Health Level Seven International® (HL7®) specification managed by the HL7 Clinical Decision Support (CDS) Workgroup that provides a way to embed additional, near real-time functionality within a clinician’s workflow of an EHR. A specified event(s) within the clinician’s workflow triggers the CDS service which gathers the appropriate specified data elements through secure Fast Healthcare Interoperability Resources® (FHIR®) services. By utilizing FHIR services, CDS Hooks provides interoperability between multiple stakeholders operating on different platforms.
+
+The CDS specification can be found here [CDS Documentation](https://cds-hooks.org/)
+
+The Clinical Decision Support Hooks REST service  can return appropriate guidance such as proposed alternative medication or formulary information.
+
+![CDS Workflow](docs/cds-image.png)
